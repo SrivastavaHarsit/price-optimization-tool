@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import ProductForm from './components/ProductForm'
 import ProductTable from './components/ProductTable'
 import SearchBar from './components/SearchBar'
-import { createProduct, getCategories, getHealth, getProducts, updateProduct } from './api/client'
+import { createProduct, deleteProduct, getCategories, getHealth, getProducts, updateProduct } from './api/client'
 import './App.css'
 
 const DEBOUNCE_DELAY_MS = 300
@@ -72,6 +72,11 @@ function App() {
     setIsProductModalOpen(true)
   }
 
+  async function refreshProductData() {
+    await loadCategories()
+    await loadProducts(debouncedSearchTerm, selectedCategory)
+  }
+
   async function handleProductSubmit(productData) {
     if (isEditMode) {
       await updateProduct(editingProduct.id, productData)
@@ -79,9 +84,24 @@ function App() {
       await createProduct(productData)
     }
 
-    await loadCategories()
-    await loadProducts(debouncedSearchTerm, selectedCategory)
+    await refreshProductData()
     closeProductModal()
+  }
+
+  async function handleDeleteProduct(product) {
+    const shouldDelete = window.confirm('Delete ' + product.name + '?')
+
+    if (shouldDelete === false) {
+      return
+    }
+
+    await deleteProduct(product.id)
+
+    if (editingProduct && editingProduct.id === product.id) {
+      closeProductModal()
+    }
+
+    await refreshProductData()
   }
 
   useEffect(() => {
@@ -121,7 +141,7 @@ function App() {
     <div className="app-shell">
       <h1>Price Optimization Tool</h1>
       <p>Frontend booted successfully.</p>
-      <p>This step reuses the same modal for create and edit, preloads row data into the form, sends a PUT request, and refreshes the list after save.</p>
+      <p>This step adds a simple delete action with browser confirmation, a DELETE request, and a full list refresh after success.</p>
 
       <section className="status-card">
         <h2>Backend Status</h2>
@@ -174,7 +194,7 @@ function App() {
             <p>
               <strong>Product count:</strong> {products.length}
             </p>
-            <ProductTable products={products} onEdit={openEditModal} />
+            <ProductTable products={products} onEdit={openEditModal} onDelete={handleDeleteProduct} />
           </div>
         ) : null}
       </section>

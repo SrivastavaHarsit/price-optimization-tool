@@ -2,7 +2,7 @@ function formatCurrency(value) {
   return '$' + Number(value).toFixed(2)
 }
 
-function ProductTable({ products, onEdit }) {
+function ProductTable({ products, onEdit, onDelete }) {
   return (
     <div className="table-wrapper">
       <table className="product-table">
@@ -29,9 +29,14 @@ function ProductTable({ products, onEdit }) {
               <td>{product.demand_forecast}</td>
               <td>{formatCurrency(product.optimized_price)}</td>
               <td>
-                <button type="button" className="secondary-button small-button" onClick={() => onEdit(product)}>
-                  Edit
-                </button>
+                <div className="table-actions">
+                  <button type="button" className="secondary-button small-button" onClick={() => onEdit(product)}>
+                    Edit
+                  </button>
+                  <button type="button" className="danger-button small-button" onClick={() => onDelete(product)}>
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -56,3 +56,9 @@ export function updateProduct(productId, productData) {
     body: JSON.stringify(productData),
   })
 }
+
+export function deleteProduct(productId) {
+  return request('/api/products/' + productId, {
+    method: 'DELETE',
+  })
+}

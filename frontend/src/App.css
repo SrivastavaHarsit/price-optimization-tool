@@ -121,8 +121,14 @@ p {
   font-size: 0.9rem;
 }
 
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .primary-button,
-.secondary-button {
+.secondary-button,
+.danger-button {
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 10px 14px;
@@ -141,6 +147,12 @@ p {
 .secondary-button {
   background: #ffffff;
   color: #111827;
+}
+
+.danger-button {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: #ffffff;
 }
 
 .primary-button:disabled {
