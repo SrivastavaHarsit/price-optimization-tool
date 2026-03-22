@@ -4,6 +4,7 @@ import ProductForm from './components/ProductForm'
 import ProductTable from './components/ProductTable'
 import SearchBar from './components/SearchBar'
 import { createProduct, deleteProduct, getCategories, getHealth, getProducts, updateProduct } from './api/client'
+import PricingPage from './pages/PricingPage'
 import './App.css'
 
 const DEBOUNCE_DELAY_MS = 300
@@ -25,6 +26,7 @@ function App() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [activeView, setActiveView] = useState('products')
 
   const isSearchPending = searchTerm === debouncedSearchTerm ? false : true
   const isEditMode = editingProduct === null ? false : true
@@ -142,7 +144,7 @@ function App() {
     <div className="app-shell">
       <h1>Price Optimization Tool</h1>
       <p>Frontend booted successfully.</p>
-      <p>This step adds the minimal Chart.js requirement: one product-wise comparison chart using the products already loaded on the page.</p>
+      <p>This step adds a minimal pricing view with a simple page switch and reuses the existing product data already loaded in state.</p>
 
       <section className="status-card">
         <h2>Backend Status</h2>
@@ -166,46 +168,77 @@ function App() {
       </section>
 
       <section className="status-card">
-        <div className="section-header">
-          <h2>Products</h2>
-          <button type="button" className="primary-button" onClick={openCreateModal}>
-            Add Product
+        <div className="view-switch">
+          <button
+            type="button"
+            className={activeView === 'products' ? 'primary-button' : 'secondary-button'}
+            onClick={() => setActiveView('products')}
+          >
+            Product Management
+          </button>
+          <button
+            type="button"
+            className={activeView === 'pricing' ? 'primary-button' : 'secondary-button'}
+            onClick={() => setActiveView('pricing')}
+          >
+            Pricing View
           </button>
         </div>
-
-        <SearchBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          selectedCategory={selectedCategory}
-          categories={categories}
-          onCategoryChange={setSelectedCategory}
-          debouncedSearchTerm={debouncedSearchTerm}
-          isSearchPending={isSearchPending}
-          debounceDelayMs={DEBOUNCE_DELAY_MS}
-        />
-
-        {categoriesError ? <p className="status-error">{categoriesError}</p> : null}
-
-        {productsLoading ? <p>Loading products...</p> : null}
-
-        {hasProductError ? <p className="status-error">{productsError}</p> : null}
-
-        {canShowProducts ? (
-          <div>
-            <p>
-              <strong>Product count:</strong> {products.length}
-            </p>
-            <ProductTable products={products} onEdit={openEditModal} onDelete={handleDeleteProduct} />
-          </div>
-        ) : null}
       </section>
 
-      {canShowProducts ? (
-        <section className="status-card">
-          <h2>Demand Forecast Chart</h2>
-          <p>This is a product-wise comparison chart, not a time-series forecast.</p>
-          <DemandChart products={products} />
-        </section>
+      {activeView === 'products' ? (
+        <>
+          <section className="status-card">
+            <div className="section-header">
+              <h2>Products</h2>
+              <button type="button" className="primary-button" onClick={openCreateModal}>
+                Add Product
+              </button>
+            </div>
+
+            <SearchBar
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              selectedCategory={selectedCategory}
+              categories={categories}
+              onCategoryChange={setSelectedCategory}
+              debouncedSearchTerm={debouncedSearchTerm}
+              isSearchPending={isSearchPending}
+              debounceDelayMs={DEBOUNCE_DELAY_MS}
+            />
+
+            {categoriesError ? <p className="status-error">{categoriesError}</p> : null}
+
+            {productsLoading ? <p>Loading products...</p> : null}
+
+            {hasProductError ? <p className="status-error">{productsError}</p> : null}
+
+            {canShowProducts ? (
+              <div>
+                <p>
+                  <strong>Product count:</strong> {products.length}
+                </p>
+                <ProductTable products={products} onEdit={openEditModal} onDelete={handleDeleteProduct} />
+              </div>
+            ) : null}
+          </section>
+
+          {canShowProducts ? (
+            <section className="status-card">
+              <h2>Demand Forecast Chart</h2>
+              <p>This is a product-wise comparison chart, not a time-series forecast.</p>
+              <DemandChart products={products} />
+            </section>
+          ) : null}
+        </>
+      ) : null}
+
+      {activeView === 'pricing' ? (
+        <PricingPage
+          products={products}
+          productsLoading={productsLoading}
+          productsError={productsError}
+        />
       ) : null}
 
       <ProductForm

@@ -61,6 +61,11 @@ p {
   margin-bottom: 16px;
 }
 
+.view-switch {
+  display: flex;
+  gap: 12px;
+}
+
 .filter-panel {
   margin-bottom: 16px;
 }
@@ -119,6 +124,11 @@ p {
 .product-table th {
   background: #f9fafb;
   font-size: 0.9rem;
+}
+
+.pricing-table .optimized-price-cell {
+  font-weight: 700;
+  color: #2563eb;
 }
 
 .table-actions {
@@ -219,4 +229,46 @@ p {
   justify-content: flex-end;
   gap: 12px;
   margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    padding: 24px 12px 40px;
+  }
+
+  .status-card {
+    padding: 16px;
+  }
+
+  .section-header,
+  .view-switch,
+  .modal-header,
+  .modal-actions,
+  .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field-wide {
+    grid-column: auto;
+  }
+
+  .chart-container {
+    height: 280px;
+  }
+
+  .modal-overlay {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .modal-card {
+    width: 100%;
+    padding: 16px;
+    margin-top: 8px;
+  }
 }
