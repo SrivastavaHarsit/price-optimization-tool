@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
+import ProductForm from './components/ProductForm'
 import ProductTable from './components/ProductTable'
 import SearchBar from './components/SearchBar'
-import { getCategories, getHealth, getProducts } from './api/client'
+import { createProduct, getCategories, getHealth, getProducts } from './api/client'
 import './App.css'
 
 const DEBOUNCE_DELAY_MS = 300
@@ -21,6 +22,41 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+
+  async function loadProducts(searchValue, categoryValue) {
+    setProductsLoading(true)
+    setProductsError('')
+
+    try {
+      const data = await getProducts({
+        search: searchValue,
+        category: categoryValue,
+      })
+      setProducts(data)
+    } catch (err) {
+      setProductsError(err.message || 'Failed to load products')
+    } finally {
+      setProductsLoading(false)
+    }
+  }
+
+  async function loadCategories() {
+    try {
+      const data = await getCategories()
+      setCategories(data)
+      setCategoriesError('')
+    } catch (err) {
+      setCategoriesError(err.message || 'Failed to load categories')
+    }
+  }
+
+  async function handleCreateProduct(productData) {
+    await createProduct(productData)
+    await loadCategories()
+    await loadProducts(debouncedSearchTerm, selectedCategory)
+    setIsCreateModalOpen(false)
+  }
 
   useEffect(() => {
     async function loadHealth() {
@@ -38,15 +74,6 @@ function App() {
   }, [])
 
   useEffect(() => {
-    async function loadCategories() {
-      try {
-        const data = await getCategories()
-        setCategories(data)
-      } catch (err) {
-        setCategoriesError(err.message || 'Failed to load categories')
-      }
-    }
-
     loadCategories()
   }, [])
 
@@ -61,31 +88,14 @@ function App() {
   }, [searchTerm])
 
   useEffect(() => {
-    async function loadProducts() {
-      setProductsLoading(true)
-      setProductsError('')
-
-      try {
-        const data = await getProducts({
-          search: debouncedSearchTerm,
-          category: selectedCategory,
-        })
-        setProducts(data)
-      } catch (err) {
-        setProductsError(err.message || 'Failed to load products')
-      } finally {
-        setProductsLoading(false)
-      }
-    }
-
-    loadProducts()
+    loadProducts(debouncedSearchTerm, selectedCategory)
   }, [debouncedSearchTerm, selectedCategory])
 
   return (
     <div className="app-shell">
       <h1>Price Optimization Tool</h1>
       <p>Frontend booted successfully.</p>
-      <p>This step adds a category dropdown and keeps both filters in page state before passing products down to the table.</p>
+      <p>This step adds a create modal with one formData object, a POST request, and a refresh after successful creation.</p>
 
       <section className="status-card">
         <h2>Backend Status</h2>
@@ -109,7 +119,12 @@ function App() {
       </section>
 
       <section className="status-card">
-        <h2>Products</h2>
+        <div className="section-header">
+          <h2>Products</h2>
+          <button type="button" className="primary-button" onClick={() => setIsCreateModalOpen(true)}>
+            Add Product
+          </button>
+        </div>
 
         <SearchBar
           searchTerm={searchTerm}
@@ -139,6 +154,12 @@ function App() {
           </div>
         ) : null}
       </section>
+
+      <ProductForm
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateProduct}
+      />
     </div>
   )
 }

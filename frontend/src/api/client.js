@@ -42,3 +42,10 @@ export function getProducts({ search = '', category = '' } = {}) {
 
   return request(path)
 }
+
+export function createProduct(productData) {
+  return request('/api/products', {
+    method: 'POST',
+    body: JSON.stringify(productData),
+  })
+}
