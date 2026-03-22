@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import ProductForm from './components/ProductForm'
 import ProductTable from './components/ProductTable'
 import SearchBar from './components/SearchBar'
-import { createProduct, getCategories, getHealth, getProducts } from './api/client'
+import { createProduct, getCategories, getHealth, getProducts, updateProduct } from './api/client'
 import './App.css'
 
 const DEBOUNCE_DELAY_MS = 300
@@ -22,7 +22,13 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState(null)
+
+  const isSearchPending = searchTerm === debouncedSearchTerm ? false : true
+  const isEditMode = editingProduct === null ? false : true
+  const hasProductError = productsLoading === false && productsError !== ''
+  const canShowTable = productsLoading === false && productsError === ''
 
   async function loadProducts(searchValue, categoryValue) {
     setProductsLoading(true)
@@ -51,11 +57,31 @@ function App() {
     }
   }
 
-  async function handleCreateProduct(productData) {
-    await createProduct(productData)
+  function closeProductModal() {
+    setIsProductModalOpen(false)
+    setEditingProduct(null)
+  }
+
+  function openCreateModal() {
+    setEditingProduct(null)
+    setIsProductModalOpen(true)
+  }
+
+  function openEditModal(product) {
+    setEditingProduct(product)
+    setIsProductModalOpen(true)
+  }
+
+  async function handleProductSubmit(productData) {
+    if (isEditMode) {
+      await updateProduct(editingProduct.id, productData)
+    } else {
+      await createProduct(productData)
+    }
+
     await loadCategories()
     await loadProducts(debouncedSearchTerm, selectedCategory)
-    setIsCreateModalOpen(false)
+    closeProductModal()
   }
 
   useEffect(() => {
@@ -95,7 +121,7 @@ function App() {
     <div className="app-shell">
       <h1>Price Optimization Tool</h1>
       <p>Frontend booted successfully.</p>
-      <p>This step adds a create modal with one formData object, a POST request, and a refresh after successful creation.</p>
+      <p>This step reuses the same modal for create and edit, preloads row data into the form, sends a PUT request, and refreshes the list after save.</p>
 
       <section className="status-card">
         <h2>Backend Status</h2>
@@ -121,7 +147,7 @@ function App() {
       <section className="status-card">
         <div className="section-header">
           <h2>Products</h2>
-          <button type="button" className="primary-button" onClick={() => setIsCreateModalOpen(true)}>
+          <button type="button" className="primary-button" onClick={openCreateModal}>
             Add Product
           </button>
         </div>
@@ -133,7 +159,7 @@ function App() {
           categories={categories}
           onCategoryChange={setSelectedCategory}
           debouncedSearchTerm={debouncedSearchTerm}
-          isSearchPending={searchTerm !== debouncedSearchTerm}
+          isSearchPending={isSearchPending}
           debounceDelayMs={DEBOUNCE_DELAY_MS}
         />
 
@@ -141,24 +167,24 @@ function App() {
 
         {productsLoading ? <p>Loading products...</p> : null}
 
-        {productsLoading === false && productsError ? (
-          <p className="status-error">{productsError}</p>
-        ) : null}
+        {hasProductError ? <p className="status-error">{productsError}</p> : null}
 
-        {productsLoading === false && productsError === '' ? (
+        {canShowTable ? (
           <div>
             <p>
               <strong>Product count:</strong> {products.length}
             </p>
-            <ProductTable products={products} />
+            <ProductTable products={products} onEdit={openEditModal} />
           </div>
         ) : null}
       </section>
 
       <ProductForm
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateProduct}
+        isOpen={isProductModalOpen}
+        mode={isEditMode ? 'edit' : 'create'}
+        initialData={editingProduct}
+        onClose={closeProductModal}
+        onSubmit={handleProductSubmit}
       />
     </div>
   )

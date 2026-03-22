@@ -49,3 +49,10 @@ export function createProduct(productData) {
     body: JSON.stringify(productData),
   })
 }
+
+export function updateProduct(productId, productData) {
+  return request('/api/products/' + productId, {
+    method: 'PUT',
+    body: JSON.stringify(productData),
+  })
+}

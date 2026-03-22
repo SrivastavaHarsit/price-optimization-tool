@@ -13,18 +13,44 @@ const INITIAL_FORM_DATA = {
   optimized_price: '0',
 }
 
-function ProductForm({ isOpen, onClose, onSubmit }) {
+function mapProductToFormData(product) {
+  if (product === null) {
+    return INITIAL_FORM_DATA
+  }
+
+  return {
+    name: String(product.name ?? ''),
+    description: String(product.description ?? ''),
+    cost_price: String(product.cost_price ?? 0),
+    selling_price: String(product.selling_price ?? 0),
+    category: String(product.category ?? ''),
+    stock_available: String(product.stock_available ?? 0),
+    units_sold: String(product.units_sold ?? 0),
+    customer_rating: String(product.customer_rating ?? 0),
+    demand_forecast: String(product.demand_forecast ?? 0),
+    optimized_price: String(product.optimized_price ?? 0),
+  }
+}
+
+function ProductForm({ isOpen, mode, initialData, onClose, onSubmit }) {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [submitError, setSubmitError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  const isEditMode = mode === 'edit'
+  const modalTitle = isEditMode ? 'Edit Product' : 'Add Product'
+  const submitLabel = submitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save Changes' : 'Create Product')
+  const helperText = isEditMode
+    ? 'This form is preloaded from the selected row. On submit it sends a PUT request and refreshes the list.'
+    : 'This form sends a plain POST request to the backend. Forecast and optimized price are entered directly for new records in this MVP.'
+
   useEffect(() => {
     if (isOpen) {
-      setFormData(INITIAL_FORM_DATA)
+      setFormData(mapProductToFormData(initialData))
       setSubmitError('')
       setSubmitting(false)
     }
-  }, [isOpen])
+  }, [isOpen, initialData])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -57,7 +83,7 @@ function ProductForm({ isOpen, onClose, onSubmit }) {
       await onSubmit(payload)
       setFormData(INITIAL_FORM_DATA)
     } catch (err) {
-      setSubmitError(err.message || 'Failed to create product')
+      setSubmitError(err.message || 'Failed to save product')
       setSubmitting(false)
       return
     }
@@ -67,21 +93,19 @@ function ProductForm({ isOpen, onClose, onSubmit }) {
 
   if (isOpen === false) {
     return null
-  } // If modal is closed return nothing
+  }
 
   return (
-    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="create-product-title">
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="product-form-title">
       <div className="modal-card">
         <div className="modal-header">
-          <h2 id="create-product-title">Add Product</h2>
+          <h2 id="product-form-title">{modalTitle}</h2>
           <button type="button" className="secondary-button" onClick={onClose}>
             Close
           </button>
         </div>
 
-        <p className="search-helper">
-          This form sends a plain POST request to the backend. Forecast and optimized price are entered directly for new records in this MVP.
-        </p>
+        <p className="search-helper">{helperText}</p>
 
         <form className="product-form" onSubmit={handleSubmit}>
           <div className="form-grid">
@@ -143,7 +167,7 @@ function ProductForm({ isOpen, onClose, onSubmit }) {
               Cancel
             </button>
             <button type="submit" className="primary-button" disabled={submitting}>
-              {submitting ? 'Creating...' : 'Create Product'}
+              {submitLabel}
             </button>
           </div>
         </form>
