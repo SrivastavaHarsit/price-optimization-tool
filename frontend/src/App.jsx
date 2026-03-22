@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import DemandChart from './components/DemandChart'
 import ProductForm from './components/ProductForm'
 import ProductTable from './components/ProductTable'
 import SearchBar from './components/SearchBar'
@@ -28,7 +29,7 @@ function App() {
   const isSearchPending = searchTerm === debouncedSearchTerm ? false : true
   const isEditMode = editingProduct === null ? false : true
   const hasProductError = productsLoading === false && productsError !== ''
-  const canShowTable = productsLoading === false && productsError === ''
+  const canShowProducts = productsLoading === false && productsError === ''
 
   async function loadProducts(searchValue, categoryValue) {
     setProductsLoading(true)
@@ -141,7 +142,7 @@ function App() {
     <div className="app-shell">
       <h1>Price Optimization Tool</h1>
       <p>Frontend booted successfully.</p>
-      <p>This step adds a simple delete action with browser confirmation, a DELETE request, and a full list refresh after success.</p>
+      <p>This step adds the minimal Chart.js requirement: one product-wise comparison chart using the products already loaded on the page.</p>
 
       <section className="status-card">
         <h2>Backend Status</h2>
@@ -189,7 +190,7 @@ function App() {
 
         {hasProductError ? <p className="status-error">{productsError}</p> : null}
 
-        {canShowTable ? (
+        {canShowProducts ? (
           <div>
             <p>
               <strong>Product count:</strong> {products.length}
@@ -198,6 +199,14 @@ function App() {
           </div>
         ) : null}
       </section>
+
+      {canShowProducts ? (
+        <section className="status-card">
+          <h2>Demand Forecast Chart</h2>
+          <p>This is a product-wise comparison chart, not a time-series forecast.</p>
+          <DemandChart products={products} />
+        </section>
+      ) : null}
 
       <ProductForm
         isOpen={isProductModalOpen}
