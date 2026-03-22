@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:14
+    container_name: price_opt_db
+    environment:
+      POSTGRES_USER: price_user
+      POSTGRES_PASSWORD: price_pass
+      POSTGRES_DB: price_optimization
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

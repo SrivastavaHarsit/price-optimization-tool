@@ -1,0 +1,105 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f7f7f7;
+  color: #1f2937;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+h1 {
+  margin: 0 0 12px;
+}
+
+p {
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.status-card {
+  margin-top: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+}
+
+.status-card h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.status-error {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.filter-panel {
+  margin-bottom: 16px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.filter-field {
+  flex: 1 1 260px;
+}
+
+.search-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.search-input,
+.category-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: inherit;
+  background: #ffffff;
+}
+
+.search-helper {
+  margin-top: 8px;
+  color: #4b5563;
+}
+
+.table-wrapper {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+
+.product-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.product-table th {
+  background: #f9fafb;
+  font-size: 0.9rem;
+}

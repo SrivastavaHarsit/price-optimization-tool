@@ -1,0 +1,34 @@
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Python
+__pycache__/
+*.py[cod]
+.python-version
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# JavaScript
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/
