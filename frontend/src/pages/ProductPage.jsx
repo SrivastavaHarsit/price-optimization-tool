@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import CompareDemandModal from '../components/CompareDemandModal'
 import DemandChart from '../components/DemandChart'
 import ProductForm from '../components/ProductForm'
 import ProductTable from '../components/ProductTable'
@@ -25,7 +26,14 @@ export function useProductPageController() {
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [selectedProductIds, setSelectedProductIds] = useState([])
+
+  const selectedProducts = useMemo(
+    () => products.filter((product) => selectedProductIds.includes(product.id)),
+    [products, selectedProductIds],
+  )
 
   const isSearchPending = searchTerm !== debouncedSearchTerm
   const isEditMode = editingProduct !== null
@@ -72,6 +80,28 @@ export function useProductPageController() {
   function openEditModal(product) {
     setEditingProduct(product)
     setIsProductModalOpen(true)
+  }
+
+  function openCompareModal() {
+    if (selectedProducts.length === 0) {
+      return
+    }
+
+    setIsCompareModalOpen(true)
+  }
+
+  function closeCompareModal() {
+    setIsCompareModalOpen(false)
+  }
+
+  function toggleProductSelection(productId) {
+    setSelectedProductIds((currentIds) => {
+      if (currentIds.includes(productId)) {
+        return currentIds.filter((id) => id !== productId)
+      }
+
+      return [...currentIds, productId]
+    })
   }
 
   async function refreshProductData() {
@@ -124,18 +154,35 @@ export function useProductPageController() {
     loadProducts(debouncedSearchTerm, selectedCategory)
   }, [debouncedSearchTerm, selectedCategory])
 
+  useEffect(() => {
+    setSelectedProductIds((currentIds) =>
+      currentIds.filter((id) => products.some((product) => product.id === id)),
+    )
+  }, [products])
+
+  useEffect(() => {
+    if (selectedProducts.length === 0) {
+      setIsCompareModalOpen(false)
+    }
+  }, [selectedProducts.length])
+
   return {
     categories,
     categoriesError,
     canShowProducts,
+    closeCompareModal,
+    closeProductModal,
+    debounceDelayMs: DEBOUNCE_DELAY_MS,
     debouncedSearchTerm,
     editingProduct,
     handleDeleteProduct,
     handleProductSubmit,
     hasProductError,
+    isCompareModalOpen,
     isEditMode,
     isProductModalOpen,
     isSearchPending,
+    openCompareModal,
     openCreateModal,
     openEditModal,
     products,
@@ -143,10 +190,11 @@ export function useProductPageController() {
     productsLoading,
     searchTerm,
     selectedCategory,
+    selectedProductIds,
+    selectedProducts,
     setSearchTerm,
     setSelectedCategory,
-    closeProductModal,
-    debounceDelayMs: DEBOUNCE_DELAY_MS,
+    toggleProductSelection,
   }
 }
 
@@ -155,14 +203,18 @@ function ProductPage({ controller }) {
     categories,
     categoriesError,
     canShowProducts,
+    closeCompareModal,
+    closeProductModal,
     debouncedSearchTerm,
     editingProduct,
     handleDeleteProduct,
     handleProductSubmit,
     hasProductError,
+    isCompareModalOpen,
     isEditMode,
     isProductModalOpen,
     isSearchPending,
+    openCompareModal,
     openCreateModal,
     openEditModal,
     products,
@@ -170,9 +222,11 @@ function ProductPage({ controller }) {
     productsLoading,
     searchTerm,
     selectedCategory,
+    selectedProductIds,
+    selectedProducts,
     setSearchTerm,
     setSelectedCategory,
-    closeProductModal,
+    toggleProductSelection,
     debounceDelayMs,
   } = controller
 
@@ -181,9 +235,14 @@ function ProductPage({ controller }) {
       <section className="status-card">
         <div className="section-header">
           <h2>Products</h2>
-          <button type="button" className="primary-button" onClick={openCreateModal}>
-            Add Product
-          </button>
+          <div className="section-actions">
+            <button type="button" className="secondary-button" onClick={openCompareModal} disabled={selectedProducts.length === 0}>
+              Compare Demand ({selectedProducts.length})
+            </button>
+            <button type="button" className="primary-button" onClick={openCreateModal}>
+              Add Product
+            </button>
+          </div>
         </div>
 
         <SearchBar
@@ -208,7 +267,16 @@ function ProductPage({ controller }) {
             <p>
               <strong>Product count:</strong> {products.length}
             </p>
-            <ProductTable products={products} onEdit={openEditModal} onDelete={handleDeleteProduct} />
+            <p className="search-helper">
+              Selected for demand comparison: <strong>{selectedProducts.length}</strong>
+            </p>
+            <ProductTable
+              products={products}
+              onEdit={openEditModal}
+              onDelete={handleDeleteProduct}
+              selectedProductIds={selectedProductIds}
+              onToggleProductSelection={toggleProductSelection}
+            />
           </div>
         ) : null}
       </section>
@@ -220,6 +288,12 @@ function ProductPage({ controller }) {
           <DemandChart products={products} />
         </section>
       ) : null}
+
+      <CompareDemandModal
+        isOpen={isCompareModalOpen}
+        products={selectedProducts}
+        onClose={closeCompareModal}
+      />
 
       <ProductForm
         isOpen={isProductModalOpen}
