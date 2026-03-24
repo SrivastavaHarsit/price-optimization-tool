@@ -1,8 +1,10 @@
+// Money formatting helper for the pricing table.
 function formatCurrency(value) {
   return '$' + Number(value).toFixed(2)
 }
 
 function PricingPage({ products, productsLoading, productsError }) {
+  // Early return for loading state so the user sees feedback immediately.
   if (productsLoading) {
     return (
       <section className="status-card">
@@ -12,6 +14,7 @@ function PricingPage({ products, productsLoading, productsError }) {
     )
   }
 
+  // Early return for error state so we do not try to render a broken table.
   if (productsError) {
     return (
       <section className="status-card">
@@ -21,6 +24,7 @@ function PricingPage({ products, productsLoading, productsError }) {
     )
   }
 
+  // Render the read-only pricing table using the product data passed in by App.jsx.
   return (
     <section className="status-card">
       <h2>Pricing Optimization</h2>
@@ -40,6 +44,7 @@ function PricingPage({ products, productsLoading, productsError }) {
           </thead>
           <tbody>
             {products.map((product) => {
+              // Price gap helps the user see how far optimized price is from the current price.
               const priceGap = Number(product.optimized_price) - Number(product.selling_price)
               const priceGapLabel = (priceGap >= 0 ? '+' : '') + priceGap.toFixed(2)
 

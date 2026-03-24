@@ -1,3 +1,4 @@
+/* Global reset and base typography */
 * {
   box-sizing: border-box;
 }
@@ -20,6 +21,7 @@ textarea {
   min-height: 100vh;
 }
 
+/* App shell layout */
 .app-shell {
   max-width: 1100px;
   margin: 0 auto;
@@ -35,6 +37,7 @@ p {
   line-height: 1.5;
 }
 
+/* Reusable white card used across pages */
 .status-card {
   margin-top: 24px;
   padding: 20px;
@@ -53,6 +56,7 @@ p {
   font-weight: 600;
 }
 
+/* Header rows used for title + actions */
 .section-header {
   display: flex;
   align-items: center;
@@ -71,6 +75,7 @@ p {
   gap: 12px;
 }
 
+/* Search/filter form layout */
 .filter-panel {
   margin-bottom: 16px;
 }
@@ -108,6 +113,7 @@ p {
   color: #4b5563;
 }
 
+/* Shared table styling */
 .table-wrapper {
   margin-top: 16px;
   overflow-x: auto;
@@ -156,6 +162,7 @@ p {
   gap: 8px;
 }
 
+/* Shared button styles */
 .primary-button,
 .secondary-button,
 .danger-button {
@@ -192,6 +199,7 @@ p {
   opacity: 0.7;
 }
 
+/* Shared chart container heights */
 .chart-container {
   margin-top: 16px;
   height: 360px;
@@ -201,6 +209,7 @@ p {
   height: 340px;
 }
 
+/* Shared modal overlay + modal card used by both ProductForm and CompareDemandModal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -261,6 +270,7 @@ p {
   margin-top: 20px;
 }
 
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .app-shell {
     padding: 24px 12px 40px;

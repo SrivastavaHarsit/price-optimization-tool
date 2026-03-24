@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+// Default form values used for create mode and for resetting after a save.
 const INITIAL_FORM_DATA = {
   name: '',
   description: '',
@@ -13,6 +14,7 @@ const INITIAL_FORM_DATA = {
   optimized_price: '0',
 }
 
+// Convert a product object from the backend into string values that inputs can display.
 function mapProductToFormData(product) {
   if (product === null) {
     return INITIAL_FORM_DATA
@@ -33,8 +35,13 @@ function mapProductToFormData(product) {
 }
 
 function ProductForm({ isOpen, mode, initialData, onClose, onSubmit }) {
+  // One object stores all form field values.
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
+
+  // Error shown inside the modal if save fails.
   const [submitError, setSubmitError] = useState('')
+
+  // Loading flag for the submit button.
   const [submitting, setSubmitting] = useState(false)
 
   const isEditMode = mode === 'edit'
@@ -44,6 +51,7 @@ function ProductForm({ isOpen, mode, initialData, onClose, onSubmit }) {
     ? 'This form is preloaded from the selected row. On submit it sends a PUT request and refreshes the list.'
     : 'This form sends a plain POST request to the backend. Forecast and optimized price are entered directly for new records in this MVP.'
 
+  // Whenever the modal opens, preload the form for edit mode or reset it for create mode.
   useEffect(() => {
     if (isOpen) {
       setFormData(mapProductToFormData(initialData))
@@ -52,6 +60,7 @@ function ProductForm({ isOpen, mode, initialData, onClose, onSubmit }) {
     }
   }, [isOpen, initialData])
 
+  // Generic change handler used by every input field.
   function handleChange(event) {
     const { name, value } = event.target
 
@@ -61,11 +70,13 @@ function ProductForm({ isOpen, mode, initialData, onClose, onSubmit }) {
     }))
   }
 
+  // Build the backend payload and call the parent submit handler.
   async function handleSubmit(event) {
     event.preventDefault()
     setSubmitting(true)
     setSubmitError('')
 
+    // Inputs store strings, so we convert number fields back into numeric types here.
     const payload = {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
@@ -91,10 +102,12 @@ function ProductForm({ isOpen, mode, initialData, onClose, onSubmit }) {
     setSubmitting(false)
   }
 
+  // Closed modal renders nothing at all.
   if (isOpen === false) {
     return null
   }
 
+  // Render the add/edit modal with controlled inputs and action buttons.
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="product-form-title">
       <div className="modal-card">

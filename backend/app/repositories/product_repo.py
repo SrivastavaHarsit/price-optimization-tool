@@ -26,7 +26,7 @@ async def get_all(
         sql += " AND category = :category"
         params["category"] = category
 
-    sql += " ORDER BY id;"
+    sql += " ORDER BY id;"  
     result = await session.execute(text(sql), params)
     return [dict(row) for row in result.mappings().all()]
 

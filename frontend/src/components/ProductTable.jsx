@@ -1,8 +1,10 @@
+// Small helper used by the table so price fields always display like money.
 function formatCurrency(value) {
   return '$' + Number(value).toFixed(2)
 }
 
 function ProductTable({ products, onEdit, onDelete, selectedProductIds, onToggleProductSelection }) {
+  // Render the product table with one row per product plus action buttons and compare checkboxes.
   return (
     <div className="table-wrapper">
       <table className="product-table">
@@ -21,6 +23,7 @@ function ProductTable({ products, onEdit, onDelete, selectedProductIds, onToggle
         </thead>
         <tbody>
           {products.map((product) => {
+            // The checkbox is controlled by selected IDs stored in ProductPage state.
             const isSelected = selectedProductIds.includes(product.id)
 
             return (

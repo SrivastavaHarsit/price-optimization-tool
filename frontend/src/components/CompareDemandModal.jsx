@@ -11,23 +11,29 @@ import {
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 
+// The compare modal uses a line chart, so it needs line-specific Chart.js pieces.
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
+// Reuse the same money formatter used in table views.
 function formatCurrency(value) {
   return '$' + Number(value).toFixed(2)
 }
 
 function CompareDemandModal({ isOpen, products, onClose }) {
+  // When the modal is closed, render nothing.
   if (isOpen === false) {
     return null
   }
 
+  // Safety guard: if nothing is selected, there is nothing to compare.
   if (products.length === 0) {
     return null
   }
 
+  // Product names become the x-axis labels.
   const labels = products.map((product) => product.name)
 
+  // Two lines are drawn: demand forecast and selling price.
   const data = {
     labels,
     datasets: [
@@ -50,6 +56,7 @@ function CompareDemandModal({ isOpen, products, onClose }) {
     ],
   }
 
+  // Modal compare chart keeps its own title and legend placement.
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -64,6 +71,7 @@ function CompareDemandModal({ isOpen, products, onClose }) {
     },
   }
 
+  // Render the compare modal with a line chart on top and a read-only summary table below.
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="compare-demand-title">
       <div className="modal-card compare-modal-card">

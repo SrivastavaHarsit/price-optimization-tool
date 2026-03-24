@@ -8,6 +8,7 @@ function SearchBar({
   isSearchPending,
   debounceDelayMs,
 }) {
+  // Render the search + filter controls. The actual state still lives in ProductPage.
   return (
     <div className="filter-panel">
       <div className="filter-row">
@@ -45,6 +46,7 @@ function SearchBar({
         </div>
       </div>
 
+      {/* Helper text makes the debounce behavior easier for a beginner to understand. */}
       <p className="search-helper">
         Input state updates immediately. The API call waits {debounceDelayMs}ms after typing stops.
       </p>
